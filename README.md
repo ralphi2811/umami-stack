@@ -66,6 +66,15 @@ openssl rand -base64 24
 docker compose up -d
 ```
 
+**Or using the Makefile:**
+
+```bash
+make up        # Start the stack
+make logs      # View logs
+make status    # Check service status
+make help      # See all available commands
+```
+
 ### 5. Access Umami
 
 Visit your configured domain (e.g., `https://analytics.yourdomain.com`)
@@ -94,7 +103,12 @@ Visit your configured domain (e.g., `https://analytics.yourdomain.com`)
 
 ## Management
 
-### View logs
+### Common Commands
+
+Using Docker Compose directly:
+
+```bash
+# View logs
 
 ```bash
 # All services
@@ -104,6 +118,20 @@ docker compose logs -f
 docker compose logs -f umami
 docker compose logs -f postgres
 docker compose logs -f cloudflared
+```
+
+### Using Makefile (Simplified)
+
+```bash
+make up        # Start the stack
+make down      # Stop the stack
+make logs      # View logs
+make restart   # Restart services
+make status    # Show service status
+make backup    # Backup database
+make secrets   # Generate secure secrets
+make validate  # Validate configuration
+make help      # Show all commands
 ```
 
 ### Stop the stack
