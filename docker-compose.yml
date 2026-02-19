@@ -26,7 +26,7 @@ services:
       DATABASE_TYPE: postgresql
       APP_SECRET: ${APP_SECRET}
       DISABLE_TELEMETRY: ${DISABLE_TELEMETRY:-1}
-      TRACKER_SCRIPT_NAME: analytics
+      TRACKER_SCRIPT_NAME: ${TRACKER_SCRIPT_NAME:-analytics}
     depends_on:
       postgres:
         condition: service_healthy

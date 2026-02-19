@@ -89,8 +89,9 @@ Visit your configured domain (e.g., `https://analytics.yourdomain.com`)
 
 ### Umami Analytics
 - **Image**: `ghcr.io/umami-software/umami:postgresql-latest`
-- **Port**: 3000 (exposed on host, configurable via `UMAMI_PORT`)
+- **Port**: 3000 (internal, accessible via Cloudflare Tunnel)
 - **Purpose**: Web analytics platform
+- **Tracker Script Name**: `analytics` (configurable via `TRACKER_SCRIPT_NAME`)
 
 ### PostgreSQL
 - **Image**: `postgres:16-alpine`
@@ -106,9 +107,6 @@ Visit your configured domain (e.g., `https://analytics.yourdomain.com`)
 ### Common Commands
 
 Using Docker Compose directly:
-
-```bash
-# View logs
 
 ```bash
 # All services
@@ -184,16 +182,16 @@ cat umami-backup-YYYYMMDD.sql | docker compose exec -T postgres psql -U ${POSTGR
 | `POSTGRES_DB` | PostgreSQL database name | `umami` | No |
 | `POSTGRES_USER` | PostgreSQL username | `umami` | No |
 | `POSTGRES_PASSWORD` | PostgreSQL password | - | **Yes** |
-| `UMAMI_PORT` | Host port for Umami | `3000` | No |
 | `APP_SECRET` | Secret for Umami sessions | - | **Yes** |
 | `DISABLE_TELEMETRY` | Disable Umami telemetry | `1` | No |
+| `TRACKER_SCRIPT_NAME` | Custom name for the tracker script | `analytics` | No |
 | `TUNNEL_TOKEN` | Cloudflare Tunnel token | - | **Yes** |
 
 ### Custom Domain Without Cloudflare Tunnel
 
 If you prefer not to use Cloudflare Tunnel, you can:
 
-1. Remove the `cloudflared` service from `docker compose.yml`
+1. Remove the `cloudflared` service from `docker-compose.yml`
 2. Set up a reverse proxy (nginx, Caddy, Traefik) pointing to `localhost:3000`
 3. Configure SSL certificates (e.g., Let's Encrypt)
 
@@ -203,7 +201,7 @@ If you prefer not to use Cloudflare Tunnel, you can:
 
 1. Check logs: `docker compose logs umami`
 2. Ensure PostgreSQL is healthy: `docker compose ps`
-3. Verify `DATABASE_URL` is correct in docker compose.yml
+3. Verify `DATABASE_URL` is correct in `docker-compose.yml`
 
 ### Can't access via Cloudflare Tunnel
 
@@ -215,7 +213,7 @@ If you prefer not to use Cloudflare Tunnel, you can:
 ### Database connection errors
 
 1. Wait for PostgreSQL to be ready (check health status)
-2. Verify credentials in `.env` match docker compose.yml
+2. Verify credentials in `.env` match `docker-compose.yml`
 3. Check network connectivity: `docker compose exec umami ping postgres`
 
 ## Security Best Practices
