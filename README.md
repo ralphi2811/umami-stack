@@ -6,7 +6,7 @@ A lightweight, production-ready Docker Compose stack for [Umami Analytics](https
 
 - 🚀 **Production-ready**: Includes health checks, restart policies, and proper volume management
 - 🔒 **Secure**: Exposed via Cloudflare Tunnel (no need to open ports on your firewall)
-- 🐳 **Easy deployment**: Single `docker-compose up` command
+- 🐳 **Easy deployment**: Single `docker compose up` command
 - 📊 **Complete stack**: Umami + PostgreSQL + Cloudflare Tunnel
 - 🔧 **Configurable**: All settings via environment variables
 
@@ -63,7 +63,7 @@ openssl rand -base64 24
 ### 4. Start the stack
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 5. Access Umami
@@ -98,31 +98,31 @@ Visit your configured domain (e.g., `https://analytics.yourdomain.com`)
 
 ```bash
 # All services
-docker-compose logs -f
+docker compose logs -f
 
 # Specific service
-docker-compose logs -f umami
-docker-compose logs -f postgres
-docker-compose logs -f cloudflared
+docker compose logs -f umami
+docker compose logs -f postgres
+docker compose logs -f cloudflared
 ```
 
 ### Stop the stack
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### Stop and remove volumes (⚠️ deletes all data)
 
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Update services
 
 ```bash
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 ```
 
 ## Backup and Restore
@@ -130,13 +130,21 @@ docker-compose up -d
 ### Backup PostgreSQL database
 
 ```bash
-docker-compose exec postgres pg_dump -U umami umami > umami-backup-$(date +%Y%m%d).sql
+# Using default values (umami/umami)
+docker compose exec postgres pg_dump -U umami umami > umami-backup-$(date +%Y%m%d).sql
+
+# Or with custom values from your .env
+docker compose exec postgres pg_dump -U ${POSTGRES_USER} ${POSTGRES_DB} > umami-backup-$(date +%Y%m%d).sql
 ```
 
 ### Restore PostgreSQL database
 
 ```bash
-cat umami-backup-YYYYMMDD.sql | docker-compose exec -T postgres psql -U umami -d umami
+# Using default values (umami/umami)
+cat umami-backup-YYYYMMDD.sql | docker compose exec -T postgres psql -U umami -d umami
+
+# Or with custom values from your .env
+cat umami-backup-YYYYMMDD.sql | docker compose exec -T postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
 ```
 
 ## Configuration
@@ -157,7 +165,7 @@ cat umami-backup-YYYYMMDD.sql | docker-compose exec -T postgres psql -U umami -d
 
 If you prefer not to use Cloudflare Tunnel, you can:
 
-1. Remove the `cloudflared` service from `docker-compose.yml`
+1. Remove the `cloudflared` service from `docker compose.yml`
 2. Set up a reverse proxy (nginx, Caddy, Traefik) pointing to `localhost:3000`
 3. Configure SSL certificates (e.g., Let's Encrypt)
 
@@ -165,13 +173,13 @@ If you prefer not to use Cloudflare Tunnel, you can:
 
 ### Umami won't start
 
-1. Check logs: `docker-compose logs umami`
-2. Ensure PostgreSQL is healthy: `docker-compose ps`
-3. Verify `DATABASE_URL` is correct in docker-compose.yml
+1. Check logs: `docker compose logs umami`
+2. Ensure PostgreSQL is healthy: `docker compose ps`
+3. Verify `DATABASE_URL` is correct in docker compose.yml
 
 ### Can't access via Cloudflare Tunnel
 
-1. Check cloudflared logs: `docker-compose logs cloudflared`
+1. Check cloudflared logs: `docker compose logs cloudflared`
 2. Verify tunnel token is correct in `.env`
 3. Ensure tunnel is active in Cloudflare dashboard
 4. Check public hostname configuration
@@ -179,8 +187,8 @@ If you prefer not to use Cloudflare Tunnel, you can:
 ### Database connection errors
 
 1. Wait for PostgreSQL to be ready (check health status)
-2. Verify credentials in `.env` match docker-compose.yml
-3. Check network connectivity: `docker-compose exec umami ping postgres`
+2. Verify credentials in `.env` match docker compose.yml
+3. Check network connectivity: `docker compose exec umami ping postgres`
 
 ## Security Best Practices
 
