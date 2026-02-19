@@ -93,7 +93,7 @@ Visit your configured domain (e.g., `https://analytics.yourdomain.com`)
 - **Purpose**: Web analytics platform
 
 ### PostgreSQL
-- **Image**: `postgres:15-alpine`
+- **Image**: `postgres:16-alpine`
 - **Purpose**: Database backend for Umami
 - **Data**: Persisted in Docker volume `postgres-data`
 
