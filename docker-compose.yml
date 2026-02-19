@@ -1,0 +1,65 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: umami-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-umami}
+      POSTGRES_USER: ${POSTGRES_USER:-umami}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-umami}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - umami-network
+
+  # Umami Analytics
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: umami-app
+    restart: unless-stopped
+    ports:
+      - "${UMAMI_PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-umami}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-umami}
+      DATABASE_TYPE: postgresql
+      APP_SECRET: ${APP_SECRET}
+      DISABLE_TELEMETRY: ${DISABLE_TELEMETRY:-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/heartbeat || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - umami-network
+
+  # Cloudflare Tunnel
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: umami-cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    depends_on:
+      umami:
+        condition: service_healthy
+    networks:
+      - umami-network
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  umami-network:
+    driver: bridge
